@@ -1,0 +1,18 @@
+* body{
+	
+	background-color:#e0d2b8;
+}
+
+input{
+	border: 1px solid;
+}
+
+.border-box{
+	border: 1px solid;
+	width: auto;
+	padding: 15px;
+	margin-bottom:5px;
+}
+span{
+	color:red;
+}
