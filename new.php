@@ -12,9 +12,10 @@ try {
     $result = $conn->query("SELECT COUNT(application_ID) as count FROM application_form WHERE application_ID='$app_id'");
     if ($result)	{
         $rows = $result->fetchAll(PDO::FETCH_OBJ);
-        if((int)$rows[0]->count < 0);
-        header('Location: form.php?msg=already');
-        exit;
+        if((int)$rows[0]->count < 0)    {
+            header('Location: form.php?msg=already');
+            exit;
+        }
 	}
     //create a prepared statement
     $statement = $conn->prepare("INSERT INTO application_form 
@@ -64,7 +65,7 @@ try {
         "citizen" => $_POST['Citizen'], 
         "eligible_to_work" => $_POST['EligibletoWorkinUS'], 
         "alien_doc" => $_POST['AlienDoc'], 
-        "race" => $_POST['Race'],
+        "race" => $_POST['race'],
         "email_address" => $_POST['EmailAddress'], 
         "foster_child" => $_POST['fosterchild'], 
         "TANF" => $_POST['tanf/calworks'], 

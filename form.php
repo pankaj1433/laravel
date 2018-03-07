@@ -10,7 +10,7 @@ try {
 	$instance = ConnectDb::getInstance();
 	$conn = $instance->getConnection();
 
-	//create a prepared statement.
+	//fetch radio_buttons
 	$result_education = $conn->query("SELECT * FROM education_status WHERE ACTIVE=1 ORDER BY SORT_KEY");
 	if ($result_education)	{
 		$rows = $result_education->fetchAll(PDO::FETCH_OBJ);
@@ -19,10 +19,7 @@ try {
 		$rows = false;
 	}
 
-	//fetch radio buttons.
-	// $result_radio = $conn->query("SELECT radio_buttons.LABEL, radio_buttons.ACTIVE,radio_buttons.SORT_KEY,radio_button_options.option_name
-	// 												FROM radio_button_options
-	// 												INNER JOIN radio_buttons ON radio_buttons.ID=radio_button_options.radio_id;");
+	//fetch radio buttons
 	$result_radio = $conn->query("SELECT * from radio_buttons");
 	if ($result_radio)	{
 		$radio_buttons = $result_radio->fetchAll(PDO::FETCH_OBJ);
@@ -30,16 +27,34 @@ try {
 	else {
 		$radio_buttons = false;
 	}
-	//get all the sort keys for education status.
-	$key_result = $conn->query("SELECT DISTINCT SORT_KEY FROM radio_buttons");
-	if ($key_result)	{
-		$sort_keys = $key_result->fetchAll(PDO::FETCH_OBJ);
-		// var_dump($sort_keys[0]->SORT_KEY);
+
+	//fetch funding_source
+	$funding_source_sql = $conn->query("SELECT * from funding_source");
+	if ($funding_source_sql)	{
+		$funding_source = $funding_source_sql->fetchAll(PDO::FETCH_OBJ);
+	}
+	else {
+		$funding_source = false;
 	}
 	
-	else {
-		$sort_keys = false;
+	//fetch race_field
+	$race_field_sql = $conn->query("SELECT * from race");
+	if ($race_field_sql)	{
+		$race_field = $race_field_sql->fetchAll(PDO::FETCH_OBJ);
 	}
+	else {
+		$race_field = false;
+	}
+
+	//get all the sort keys for education status.
+	// $key_result = $conn->query("SELECT DISTINCT SORT_KEY FROM radio_buttons");
+	// if ($key_result)	{
+	// 	$sort_keys = $key_result->fetchAll(PDO::FETCH_OBJ);
+	// }
+	
+	// else {
+	// 	$sort_keys = false;
+	// }
 }
 catch(PDOException $e)
 {
@@ -102,16 +117,16 @@ catch(PDOException $e)
 		  <input value="" type="text" id="applicationId" name="applicationId" style="width:100%;" required/>
 		</div>
 		<div class="col">
-		 <input value="" type="text" name="application Date" style="width:100%;" required/>
+		 <input value="" type="text" name="application Date" style="width:100%; background-color:#e0d2b8;" required/>
 		</div>
 		<div class="col">
-		  <input value="" type="text" name="enrollment Date" style="width:100%;" required/>
+		  <input value="" type="text" name="enrollment Date" style="width:100%; background-color:#e0d2b8;" required/>
 		</div>
 		<div class="col">
-		  <input value="" type="text" name="assigned_agency" style="width:100%;" required/>
+		  <input value="" type="text" name="assigned_agency" style="width:100%; background-color:#e0d2b8;" required/>
 		</div>
 		<div class="col">
-		  <input value="" type="text" name="current_status" required/>
+		  <input value="" type="text" name="current_status"  style="width:100%; background-color:#e0d2b8;" required/>
 		</div>
 	  </div>
 	  <div class="row">
@@ -144,10 +159,21 @@ catch(PDOException $e)
 		<div class="col">
 		  <input value="" type="text" name="socialsecuritynumber" style="width:100%;"/>
 		</div>
-		 
-		<div class="col">
-		  <input type="text" name="fundingsource" style="width:100%;"/>
+		<div class='col'>
+			<select name='fundingsource'>
+			<option value=''>-- Select Funding Source --</option>
+			<?php
+					if ($funding_source) {
+						foreach ($funding_source as $source ) {
+							if ($source->Active_Status == 'No' || $source->Active_Status == 'no' || $source->Active_Status == 'NO')
+								continue;
+							echo "<option value='$source->Label'>$source->Label</option>";
+						}
+					}
+			?>
+			</select>
 		</div>
+
 		<div class="col">
 		  <input type="text" name="CalJobsapp" style="width:100%;"/>
 		</div>
@@ -169,7 +195,7 @@ catch(PDOException $e)
 		  <input type="date" name="birth_date" style="width:100%;"/>
 		</div>
 		<div class="col">
-		  <input type="text" name="Age" style="width:100%;"/>
+		  <input type="text" name="Age" style="width:100%; background-color:#e0d2b8;"/>
 		</div>
 		<div class="col-6">
 		  <input type="radio" name="Gender" value="Male">Male
@@ -259,6 +285,9 @@ catch(PDOException $e)
 		<div class="col">
 		 <b>Race</b><span>*</span>
 		</div>
+		<div class="col">
+		 <b>Unincorporated Area</b>
+		</div>
     </div>
 	<div class="row">
 		
@@ -273,8 +302,23 @@ catch(PDOException $e)
 		<div class="col">
 		  <input type="text" name="AlienDoc" style="width:100%;"/>
 		</div>
+		<div class='col'>
+			<select name='race'>
+				<option value=''>-- Select Funding Source --</option>
+				<?php
+						if ($race_field) {
+							foreach ($race_field as $race ) {
+								if ($race->Active_Status == 'No' || $race->Active_Status == 'no' || $race->Active_Status == 'NO')
+									continue;
+								echo "<option value='$race->Label'>$race->Label</option>";
+							}
+						}
+				?>
+			</select>
+		</div>
 		<div class="col">
-		  <input type="text" name="Race" style="width:100%;"/>
+		  <input type="radio" name="Unincorporated Area" value="Yes">Yes
+          <input type="radio" name="Unincorporated Area" value="No"> No
 		</div>
 	</div>
 	<div class="row">
@@ -311,12 +355,14 @@ catch(PDOException $e)
 		<?php
 			//render radio buttons
 			foreach ($radio_buttons as $radio_button) {
+				if ($radio_button->ACTIVE == 0) 
+					continue;
 				$input_name = strtolower(str_replace(' ', '', $radio_button->LABEL));
 				//radio button label
 				echo "<div class='radio $radio_button->SORT_KEY'><b>$radio_button->LABEL</b><span>*</span><br>";
 				try {
 					//options for radio buttons
-					$options_sql = $conn->query("SELECT * from radio_button_options where radio_id=".$radio_button->ID);
+					$options_sql = $conn->query("SELECT * from radio_button_options where radio_id=".$radio_button->ID." ORDER BY sort_key");
 					$options = ($options_sql) ? $options_sql->fetchAll(PDO::FETCH_OBJ):false;
 					if ($options) {
 						foreach($options as $option) {
@@ -349,6 +395,9 @@ catch(PDOException $e)
 				?>
 				</select>
 			</div>
+			<div class='col'></div>
+			<div class='col'></div>
+			<div class='col'></div>
 		</div>
 		<?php 
 		// render Education Status Row.
@@ -543,7 +592,7 @@ catch(PDOException $e)
 								$('[name="Citizen"][value="'+result.citizen+'"]').attr('checked', 'checked')
 								$('[name="EligibletoWorkinUS"][value="'+result.eligible_to_work+'"]').attr('checked', 'checked')
 								$('[name="AlienDoc"]').val(result.alien_doc)
-								$('[name="Race"]').val(result.race)
+								$('[name="race"]').val(result.race)
 								$('[name="EmailAddress"]').val(result.email_address)
 								$('[name="fosterchild"][value="'+result.foster_child+'"]').attr('checked', 'checked')
 								$('[name="tanf/calworks"][value="'+result.TANF+'"]').attr('checked', 'checked')

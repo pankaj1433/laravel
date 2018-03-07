@@ -7,7 +7,7 @@ class ConnectDb {
   
   private $host = 'localhost';
   private $user = 'root';
-  private $pass = '';
+  private $pass = 'root';
   private $name = 'app_one';
    
   // The db connection is established in the private constructor.
